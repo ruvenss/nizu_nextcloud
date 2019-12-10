@@ -1,10 +1,161 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); 
     include("nizu/config.php");
     include("nizu/functions.php");
+    $hashpassword="";
     if (isset($_REQUEST['a'])) {
         $action=$_REQUEST['a'];
         
         switch ($action) {
+        	case "export_legacy":
+        		include("nizu/db.php");
+        		$exported=0;
+        		$mainquery="SELECT * FROM legacy.user";
+				$result = $mas->query($mainquery);
+				if (!$result) {
+					echo $mainquery;
+					error_log("sqlSelect empty result : $mainquery",0);
+				} else {
+					while($row = $result->fetch_assoc()) {
+						$user_id=$row['user_id'];
+						$user_active=$row['user_active'];
+						$user_allow=$row['user_allow'];
+						$user_newsletter=$row['user_newsletter'];
+						$user_test=$row['user_test'];
+						$user_level=$row['user_level'];
+						$user_request=$row['user_request'];
+						$user_email=$row['user_email'];
+						$user_password=$row['user_password'];
+						$user_gender=$row['user_gender'];
+						$user_title=$row['user_title'];
+						$user_firstname=trim($row['user_firstname']);
+						$user_name=trim($row['user_name']);
+						$user_address=trim($row['user_address']);
+						$user_num=$row['user_num'];
+						$user_box=$row['user_box'];
+						$user_zip=trim($row['user_zip']);
+						$user_city=$row['user_city'];
+						$user_state=$row['user_state'];
+						$user_countryid=$row['user_countryid'];
+						$user_phone=$row['user_phone'];
+						$user_fax=$row['user_fax'];
+						$user_mobile=$row['user_mobile'];
+						$user_address2=$row['user_address2'];
+						$user_num2=$row['user_num2'];
+						$user_box2=$row['user_box2'];
+						$user_zip2=trim($row['user_zip2']);
+						$user_city2=$row['user_city2'];
+						$user_state2=$row['user_state2'];
+						$user_countryid2=trim($row['user_countryid2']);
+						$user_phone2=$row['user_phone2'];
+						$user_fax2=$row['user_fax2'];
+						$user_mobile2=$row['user_mobile2'];
+						$user_nationality=$row['user_nationality'];
+						$user_firm=$row['user_firm'];
+						$user_department=$row['user_department'];
+						$user_position=$row['user_position'];
+						$user_firmtype=$row['user_firmtype'];
+						$user_mainactivity=$row['user_mainactivity'];
+						$user_firmnumber=$row['user_firmnumber'];
+						$user_retired=$row['user_retired'];
+						$user_dateretire=$row['user_dateretire'];
+						$user_totalcomplement=$row['user_totalcomplement'];
+						$user_topicsid=$row['user_topicsid'];
+						$user_fieldsid=$row['user_fieldsid'];
+						$user_ingfields=$row['user_ingfields'];
+						$user_profields=$row['user_profields'];
+						$user_nchapterids=$row['user_nchapterids'];
+						$user_remarks=$row['user_remarks'];
+						$user_datevki_in=$row['user_datevki_in'];
+						$user_datevki_out=$row['user_datevki_out'];
+						$user_datedc_in=$row['user_datedc_in'];
+						$user_datedc_out=$row['user_datedc_out'];
+						$user_datephd_in=$row['user_datephd_in'];
+						$user_datephd_out=$row['user_datephd_out'];
+						$user_dateatp_in=$row['user_dateatp_in'];
+						$user_dateatp_out=$row['user_dateatp_out'];
+						$user_datere_in=$row['user_datere_in'];
+						$user_datere_out=$row['user_datere_out'];
+						$user_datepdp_in=$row['user_datepdp_in'];
+						$user_datepdp_out=$row['user_datepdp_out'];
+						$user_datefm_in=$row['user_datefm_in'];
+						$user_datefm_out=$row['user_datefm_out'];
+						$user_datevp_in=$row['user_datevp_in'];
+						$user_datevp_out=$row['user_datevp_out'];
+						$user_lastupdate=$row['user_lastupdate'];
+						$user_logincount=$row['user_logincount'];
+						$user_lastlogin=$row['user_lastlogin'];
+						$user_lang=$row['user_lang'];
+						$user_ip=$row['user_ip'];
+						$user_useragent=$row['user_useragent'];
+						$user_userlang=$row['user_userlang'];
+						$user_datein=$row['user_datein'];
+						$user_timein=$row['user_timein'];
+						// Translations
+						if ($user_level=="1") {
+							$nizu_user_group_id=4;
+							$nc_user_group_label="Keep in touch";
+						} else {
+							$nizu_user_group_id=5;
+							$nc_user_group_label="LES network";
+						}
+						if ($user_retired===1) { $nizu_retired="Yes"; } else { $nizu_retired="No"; }
+						if ($user_allow===1) { $nizu_public_profile="Yes"; } else { $nizu_public_profile="No"; }
+						//$e="cd ".$nizu_nextcloud_settings['nizu_nextcloud_path'].";export OC_PASS=$user_password;".'php occ user:add --password-from-env --display-name="'.$nizu_contact_email.'" --group="users" '.$nizu_contact_email;
+						$membername=$user_firstname." ".$user_name;
+						$countryid=0;
+						$countryid2=0;
+						if (strlen($user_countryid)>0) {
+							$countryid=sqlSelect($mas,db_prefix()."countries","country_id","iso2='$user_countryid'");
+						} else {
+							$countryid="";
+						}
+						if (strlen($user_countryid2)>0) {
+							$countryid2=sqlSelect($mas,db_prefix()."countries","country_id","iso2='$user_countryid2'");
+						} else {
+							$countryid2="";
+						}
+						if ($countryid<=0) { $countryid="NULL"; }
+						if ($countryid2<=0) { $countryid2="NULL"; }
+						$user_address.=trim(" ".$user_num);
+						$user_address2.=trim(" ".$user_num2);
+						if ($user_state=="0") { $user_state="";}
+						if ($user_state2=="0") { $user_state2="";}
+						if (strlen($user_state)==0){
+							$user_state=getState($user_countryid,$user_zip);
+						}
+						if (strlen($user_state2)==0){
+							$user_state2=getState($user_countryid2,$user_zip2);
+						}
+						$user_address=str_replace("/"," ",$user_address);
+						$user_address=str_replace('"'," ",$user_address);
+						$memberdata=["phonenumber"=>$user_phone,"country"=>$countryid,"city"=>$user_city,"zip"=>$user_zip,"state"=>$user_state,"address"=>$user_address,"active"=>$user_active,"billing_street"=>$user_address2,"billing_city"=>$user_city2,"billing_state"=>$user_state2,"billing_zip"=>$user_zip2,"billing_country"=>$countryid2];
+						$memberid=createNizuCustomer($mas,db_prefix(),$membername,"english",$memberdata);
+						$memberdata=[];
+						if ($memberid>0) {
+							
+							// Update custom fields
+							
+							if (strlen($user_email)>3 && $user_active>0) {
+								// Add member to the group
+								$user_group_keyid=sqlInsert($mas,db_prefix()."customer_groups",array("groupid","customer_id"),array($nizu_user_group_id,$memberid));
+								// Create Contact
+								// Next Cloud
+								//$e="cd ".$nizu_nextcloud_settings['nizu_nextcloud_path'].";export OC_PASS=$user_password;".'php occ user:add --password-from-env --display-name="'.$nizu_contact_email.'" --group="users" '.$nizu_contact_email;
+								//$e2="cd ".$nizu_nextcloud_settings['nizu_nextcloud_path'].";".'php occ group:adduser "'.$nc_user_group_label.'" '.$user_email;
+							} else {
+								// set unactive
+								sqlUpdate($mas,db_prefix()."clients",array("active"),array("0"),"userid",$memberid);
+							}
+							$exported=$exported+1;
+							
+						}	
+					}
+				}
+				
+        		//$hashpassword=app_hash_password("123123");
+        		//$hashpassword=sha1("123123");
+        		goodbye(1,array("exported"=>$exported));
+        		break;
             case 'NizuLoadForm':
                 $table=$_REQUEST['form'];
                 $apikey=$_REQUEST['key'];
@@ -97,6 +248,35 @@
             }
         }  
     }
+function getState($country,$cp) {
+	$state="";
+	switch ($country) {
+    	case 'BE':
+    		switch ($cp) {
+    			case '1410':
+    			case '1420':
+    				$state="Wallonia";
+    			break;
+    			case '1000':
+    			case '1010':
+    			case '1020':
+    			case '1030':
+    			case '1040':
+    			case '1049':
+    			case '1050':
+    				$state="Brussels Region";
+    			break;
+        		default:
+    			# code...
+    			break;
+    		}
+        break;
+        default:
+    	# code...
+        break;
+    }
+    return($state);
+}
 ?>
 <?php init_head(); ?>
 <?php nizu_loadcss($nizu_settings_theme); ?>
@@ -108,251 +288,20 @@
                     <div class="panel-body">
                         <h4 class="no-margin"><img src="/nizu/images/nizu_logo.svg" width="30"> Nizu NextCloud</h4>
                         <hr class="hr-panel-heading" />
-                        
+                        <div class="row">
+                            <div class="col-md-6"><button class="btn btn-lg btn-primary" id="btn_export_current">Send <?php echo _l("clients");?> and Groups to Next Cloud ></button></div>
+                            <div class="col-md-6"><button class="btn btn-lg btn-primary" id="btn_export_legacy">Export <?php echo _l("clients");?> Legacy ></button></div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+        <div class="row">
+        	<div class="col">Password: <?php echo $hashpassword; ?></div>
+        </div>
     </div>
 </div>
-<div class="modal fade" id="nizu_agenda_services" tabindex="-1" role="dialog" data-id="0">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title"><i class="fa fa-cogs"></i> <?php echo _l('service'); ?></h4>
-            </div>
-            <div class="modal-body">
-                <div class="content">
-                    <div class="row">
-                        <div class="col">
-                            <div class="form-group" app-field-wrapper="service_subject"><label for="service_subject" class="control-label"><small class="req text-danger">* </small><?php echo _l('servicetitle');?></label><input type="input" id="service_subject" name="service_subject" class="form-control" ></div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col">
-                            <div class="form-group" app-field-wrapper="service_description"><label for="service_description" class="control-label"><?php echo _l('project_description');?></label><textarea id="service_description" name="service_description" class="form-control"></textarea> </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col">
-                            <div class="form-group" app-field-wrapper="service_thumb_picurl"><label for="service_thumb_picurl" class="control-label"><i class="fa fa-camera"></i> <?php echo _l('cf_translate_input_link_url');?></label><input type="input" id="service_thumb_picurl" name="service_thumb_picurl" class="form-control" ></div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group" app-field-wrapper="service_price"><label for="service_price" class="control-label"><?php echo _l('invoice_item_add_edit_rate');?></label><input type="number" id="service_price" name="service_price" class="form-control nizu_number"></div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group" app-field-wrapper="service_currency"><label for="service_currency" class="control-label"><?php echo _l('currency');?></label><input type="input" id="service_currency" name="service_currency" class="form-control" maxlength="3"></div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group" app-field-wrapper="service_lang"><label for="service_lang" class="control-label"><?php echo _l('form_lang_validation');?></label>
-                                <select name="nizu_agenda[service_lang]" data-live-search="true" id="service_lang" class="form-control selectpicker" data-none-selected-text="<?php echo _l('dropdown_non_selected_tex'); ?>">
-                                <?php foreach($this->app->get_available_languages() as $availableLanguage){
-                                        $subtext = hooks()->apply_filters('settings_language_subtext', '', $availableLanguage);
-                                    ?>
-                                    <option value="<?php echo $availableLanguage; ?>" data-value="<?php echo $subtext; ?>" <?php if($availableLanguage == get_option('active_language')){echo ' selected'; } ?>><?php echo ucfirst($availableLanguage); ?></option>
-                                    <?php } ?>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group" app-field-wrapper="service_lang"><label for="service_lang" class="control-label"><?php echo _l('timeduration');?></label>
-                                <select name="nizu_agenda[service_duration]" data-live-search="true" id="service_duration" class="form-control selectpicker" data-none-selected-text="<?php echo _l('dropdown_non_selected_tex'); ?>">
-                                    <option value="00:15" data-value="00:15">00:15</option>
-                                    <option value="00:30" data-value="00:30">00:30</option>
-                                    <option value="00:45" data-value="00:45">00:45</option>
-                                    <option value="01:00" data-value="01:00">01:00</option>
-                                    <option value="01:15" data-value="01:15">01:15</option>
-                                    <option value="01:30" data-value="01:30">01:30</option>
-                                    <option value="01:45" data-value="01:45">01:45</option>
-                                    <option value="02:00" data-value="02:00">02:00</option>
-                                    <option value="02:15" data-value="02:15">02:15</option>
-                                    <option value="02:30" data-value="02:30">02:30</option>
-                                    <option value="02:45" data-value="02:45">02:45</option>
-                                    <option value="03:00" data-value="03:00">03:00</option>
-                                    <option value="03:15" data-value="03:15">03:15</option>
-                                    <option value="03:30" data-value="03:30">03:30</option>
-                                    <option value="03:45" data-value="03:45">03:45</option>
-                                    <option value="04:00" data-value="04:00">04:00</option>
-                                    <option value="04:15" data-value="04:15">04:15</option>
-                                    <option value="04:30" data-value="04:30">04:30</option>
-                                    <option value="04:45" data-value="04:45">04:45</option>
-                                    <option value="05:00" data-value="05:00">05:00</option>
-                                    <option value="05:15" data-value="05:15">05:15</option>
-                                    <option value="05:30" data-value="05:30">05:30</option>
-                                    <option value="05:45" data-value="05:45">05:45</option>
-                                    <option value="06:00" data-value="06:00">06:00</option>
-                                    <option value="06:15" data-value="06:15">06:15</option>
-                                    <option value="06:30" data-value="06:30">06:30</option>
-                                    <option value="06:45" data-value="06:45">06:45</option>
-                                    <option value="07:00" data-value="07:00">07:00</option>
-                                    <option value="07:15" data-value="07:15">07:15</option>
-                                    <option value="07:30" data-value="07:30">07:30</option>
-                                    <option value="07:45" data-value="07:45">07:45</option>
-                                    <option value="08:00" data-value="08:00">08:00</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group" app-field-wrapper="service_active"><label for="service_active" class="control-label"><small class="req text-danger">* </small><?php echo _l('subscription_active');?></label>
-                                <select name="nizu_agenda_services[service_active]" data-live-search="true" id="service_active" class="form-control selectpicker" data-none-selected-text="<?php echo _l('dropdown_non_selected_tex'); ?>">
-                                    <option value="0" data-value="0"><?php echo _l('no'); ?></option>
-                                    <option value="1" data-value="1"><?php echo _l('yes'); ?></option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col">
-                <?php
-                    //custom fields
-                    $custom_fields = get_custom_fields('nizu_agendas_se');
-                    foreach($custom_fields as $field){
-                        echo '<div class="form-group" app-field-wrapper="'.$field['slug'].'"><label for="'.$field['slug'].'" class="control-label">'.$field['name'].'</label>'."\r\n";
-                        echo '                    <input type="'.$field['type'].'" name="'.$field['slug'].'" id="'.$field['slug'].'" class="form-control">'."\r\n";
-                        echo '                </div>'."\r\n";
-                    }
-                ?>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
-                <button class="btn btn-info nizu_xhr_submit" data-modal="nizu_agenda_services"><?php echo _l('submit'); ?></button>
-            </div>
-        </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
-<div class="modal fade" id="nizu_agendas" tabindex="-1" role="dialog" data-id="0">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title"><i class="fa fa-book"></i> <?php echo _l('agenda'); ?></h4>
-            </div>
-            <div class="modal-body">
-                <div class="content">
-                    <div class="row">
-                        <div class="col">
-                            <div class="form-group" app-field-wrapper="agenda_title"><label for="agenda_title" class="control-label"><small class="req text-danger">* </small><?php echo _l('name');?></label><input type="input" id="agenda_title" name="agenda_title" class="form-control" ></div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group" app-field-wrapper="agenda_type"><label for="agenda_type" class="control-label"><small class="req text-danger">* </small><?php echo _l('type');?></label>
-                                <select name="nizu_agenda[agenda_type]" data-live-search="true" id="agenda_type" class="form-control selectpicker" data-none-selected-text="<?php echo _l('dropdown_non_selected_tex'); ?>">
-                                    <option value="1" data-value="1"><?php echo _l('yougotoyourcustomer'); ?></option>
-                                    <option value="2" data-value="2"><?php echo _l('customercomestoyou'); ?></option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group" app-field-wrapper="agenda_public"><label for="agenda_public" class="control-label"><small class="req text-danger">* </small><?php echo _l('public');?></label>
-                                <select name="nizu_agenda[agenda_public]" data-live-search="true" id="agenda_public" class="form-control selectpicker" data-none-selected-text="<?php echo _l('dropdown_non_selected_tex'); ?>">
-                                    <option value="0" data-value="0"><?php echo _l('no'); ?></option>
-                                    <option value="1" data-value="1"><?php echo _l('yes'); ?></option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group" app-field-wrapper="agenda_color"><label for="agenda_color" class="control-label"><?php echo _l('color');?></label>
-                                <input type="input" id="agenda_color" name="agenda_color" class="form-control" >
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group" app-field-wrapper="agenda_google_id"><label for="agenda_google_id" class="control-label"><?php echo _l('settings_gcal_main_calendar_id');?></label>
-                                <input type="input" id="agenda_google_id" name="agenda_google_id" class="form-control" >
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group" app-field-wrapper="nizu_api_publickey"><label for="agenda_color" class="control-label"><?php echo _l('nizu_api_publickey');?></label>
-                                <input type="input" id="nizu_api_publickey" name="nizu_api_publickey" class="form-control" >
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group" app-field-wrapper="nizu_api_keyid"><label for="nizu_api_keyid" class="control-label"><?php echo _l('nizu_api_keyid');?></label>
-                                <input type="input" id="nizu_api_keyid" name="nizu_api_keyid" class="form-control" >
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group" app-field-wrapper="nizu_widget_domain"><label for="nizu_widget_domain" class="control-label"><?php echo _l('nizu_agenda_website_domain');?></label>
-                                <input type="input" id="nizu_widget_domain" name="nizu_widget_domain" class="form-control" >
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group" app-field-wrapper="country"><label for="country" class="control-label"><?php echo _l('clients_country');?></label>
-                                <select name="nizu_agenda[country]" data-live-search="true" id="country" class="form-control selectpicker" data-none-selected-text="<?php echo _l('dropdown_non_selected_tex'); ?>">
-                                    <?php
-                                    $query = $this->db->query('SELECT `iso2`, `short_name` FROM '.db_prefix().'countries');
-                                    foreach ($query->result_array() as $row){
-                                        echo '<option value="'.$row['iso2'].'" data-value="'.$row['iso2'].'">'.$row['short_name'].'</option>';
-                                    }
-                                    ?>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group" app-field-wrapper="holidaysoff"><label for="holidaysoff" class="control-label"><?php echo _l('holidaysoff');?></label>
-                                <select name="nizu_agenda[holidaysoff]" data-live-search="true" id="holidaysoff" class="form-control selectpicker" data-none-selected-text="<?php echo _l('dropdown_non_selected_tex'); ?>">
-                                    <option value="0" data-value="0"><?php echo _l('no'); ?></option>
-                                    <option value="1" data-value="1"><?php echo _l('yes'); ?></option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group" app-field-wrapper="nizu_weekendsoff"><label for="nizu_weekendsoff" class="control-label"><?php echo _l('nizu_weekendsoff');?></label>
-                                <select name="nizu_agenda[nizu_weekendsoff]" data-live-search="true" id="nizu_weekendsoff" class="form-control selectpicker" data-none-selected-text="<?php echo _l('dropdown_non_selected_tex'); ?>">
-                                    <option value="0" data-value="0"><?php echo _l('no'); ?></option>
-                                    <option value="1" data-value="1"><?php echo _l('yes'); ?></option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
-                <button class="btn btn-info nizu_xhr_submit" data-modal="nizu_agendas"><?php echo _l('submit'); ?></button>
-            </div>
-        </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
-<div class="modal fade" id="nizu_agenda_bookings" tabindex="-1" role="dialog" data-id="0">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title"><i class="fa fa-cogs"></i> <?php echo _l('service'); ?></h4>
-            </div>
-            <div class="modal-body">
-                <div class="content">
-                </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
-                <button class="btn btn-info nizu_xhr_submit" data-modal="nizu_agenda_bookings"><?php echo _l('submit'); ?></button>
-            </div>
-        </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
+
 <?php init_tail(); ?>
 <script>
    $(function(){
@@ -385,99 +334,17 @@
     var nizuapi_key = "<?php echo $nizu_settings_key; ?>";
     var nizuuser_id = "<?php echo $nizu_settings_user_id; ?>";
     var nizuuemailsender = "<?php echo $nizu_settings_user_email; ?>";
-    var NizuPostVars = {a:"NizuFormSave"};
-    var nizu_agendas_cols   = [{text: '<?php echo _l('agenda_title'); ?>', datafield: 'agenda_title' },{ text: '<?php echo _l('published'); ?>', datafield: 'agenda_public', width: 70,columntype: 'checkbox' }];
-    var nizu_agendas_fields = [{name:'id',type:'string'},{name:'agenda_title',type:'string'},{name:'agenda_public',type:'bool'}];
-    var nizu_services_cols   = [{text:'<?php echo _l('project_discussion_subject'); ?>',datafield:'service_subject'},{text:'<?php echo _l('invoice_items_list_rate'); ?>', datafield: 'service_price', width: 100 },{text:'<?php echo _l('custom_field_add_edit_active'); ?>', datafield: 'service_active', width: 70,columntype: 'checkbox' }];
-    var nizu_services_fields = [{name:'id',type:'string'},{name:'service_subject',type:'string'},{name:'service_price',type:'number'},{name:'service_active',type:'bool'}];
-    //id,fullname,calendar_date,calendar_starttime,service_id,email,phone,mobile_verified,email_verified
-    var nizu_bookings_cols   = [{text:'<?php echo _l('clients_list_full_name'); ?>',datafield:'fullname'},{text:'<?php echo _l('date_created'); ?>', datafield: 'calendar_date', width: 100 }];
-    var nizu_bookings_fields = [{name:'id',type:'string'},{name:'fullname',type:'string'},{name:'calendar_date',type:'date'}];
-    
-    var nizu_grid_selected_rowindex=0;
-    var nizu_current_modalid="";
     $(function(){
         appValidateForm($('form'),{export_type:'required',export_module:'required'});
     });
     document.addEventListener('DOMContentLoaded', function() {
-        var nizu_cal_frame_pos = $("#nizu_cal_frame").position();
-        var nizu_cal_frame_h=window.innerHeight-nizu_cal_frame_pos.top-170;
-        var nizu_grid_frame_h=window.innerHeight-nizu_cal_frame_pos.top-200;
-        $(".nizu_cal_frame").css("height",nizu_cal_frame_h+"px");
-        var calendarEl = document.getElementById('nizu_cal_dashboard');
-        var calendar = new FullCalendar.Calendar(calendarEl, {
-          plugins: [ 'interaction', 'dayGrid', 'timeGrid', 'list' ],
-          header: {
-            left: 'prev,next today',
-            center: 'title',
-            right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
-          },
-          height: 'parent',
-          defaultView: 'listWeek',
-          navLinks: true, // can click day/week names to navigate views
-          editable: true,
-          eventLimit: true,
-          loading: function(bool){
-            if (bool) {
-                
-            } else {
-                
-            }
-          }
+        $("#btn_export_legacy").on("click",function(){
+        	$(this).css("display","none");
+        	nizu_GetData({a:"export_legacy",key:nizuapi_key},"Loading...",function(data) {
+        		$("#btn_export_legacy").css("display","block");
+        	});
         });
-
-        calendar.render();
-        $("#nizu_cal_dashboard").css("display","block");
-        listenToolBox();
-        
     });
-function listenToolBox(){
-    $(".nizu_toolbox_btn").on("click",function(){
-        $(".nizu_cal_tab").css("display","none");
-        $("#nizu_cal_content_title").text($(this).data("title"));
-        $(".nizu_cal_tab_"+$(this).data("tab")).css("display","block");
-        switch ($(this).data("tab")) {
-
-            case 2:
-                loadAgendasList();
-                break;
-            case 3:
-                loadServicesList();
-                break;
-            case 4:
-                loadBookingsList();
-                break;
-        }
-    });
-    $(".nizu_xhr_submit").on("click",function(){
-        console.log("submit data");
-        $('#'+$(this).data("modal")).modal('hide');
-        NizuSaveForm($(this).data("modal"));
-    });
-    var AgendasEvents = new NizuJQXGridEvents("table_nizu_agendas","nizu_agendas","nizu_agendas");
-    var ServicesEvents = new NizuJQXGridEvents("table_nizu_services","nizu_agenda_services","nizu_agenda_services");
-}
-function loadAgendasList() {
-    nizu_GetData({a:"nizu_load_agendas",key:nizuapi_key,id:nizuuser_id},"Loading...",function(data) {
-        var nizu_cal_frame_pos = $("#nizu_cal_frame").position();
-        var H=window.innerHeight-nizu_cal_frame_pos.top-200;
-         NizuRenderJQXGrid("table_nizu_agendas","<?php echo $nizu_settings_theme;?>",H,data.data,nizu_agendas_fields,nizu_agendas_cols);  
-    });
-}
-function loadServicesList() {
-    nizu_GetData({a:"nizu_load_services",key:nizuapi_key,id:nizuuser_id},"Loading...",function(data) {
-        var nizu_cal_frame_pos = $("#nizu_cal_frame").position();
-        var H=window.innerHeight-nizu_cal_frame_pos.top-200;
-         NizuRenderJQXGrid("table_nizu_services","<?php echo $nizu_settings_theme;?>",H,data.data,nizu_services_fields,nizu_services_cols);  
-    });
-}
-function loadBookingsList() {
-    nizu_GetData({a:"nizu_load_bookings",key:nizuapi_key,id:nizuuser_id},"Loading...",function(data) {
-        var nizu_cal_frame_pos = $("#nizu_cal_frame").position();
-        var H=window.innerHeight-nizu_cal_frame_pos.top-200;
-         NizuRenderJQXGrid("table_nizu_agenda_bookings","<?php echo $nizu_settings_theme;?>",H,data.data,nizu_bookings_fields,nizu_bookings_cols);  
-    });
-}
 </script>
 </body>
 </html>
